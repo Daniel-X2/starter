@@ -1,0 +1,8 @@
+{
+  icon = " ",
+  desc = "New Projects",
+  key = "N",
+  action = function()
+    require("utils.projects").create_new_project()
+  end,
+},

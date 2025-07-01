@@ -6,15 +6,28 @@ vim.keymap.set({ "n", "i" }, "<F1>", "<Nop>", { silent = true })
 vim.keymap.set("n", "<F2>", "<nop>")
 
 require("config.lazy")
+
+
+
+
+
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
-    -- Se nenhum arquivo foi aberto (nenhum argumento passado)
-    if vim.fn.argc() == 0 then
-      -- Abre o dashboard
-      vim.cmd("Dashboard")
+    if vim.fn.argc() == 0 then  -- Se nenhum arquivo foi aberto
+      vim.cmd("Dashboard")      -- Abre o dashboard
     end
   end,
 })
+  
+
+
+
+
+
+
+
+    -- Se nenhum arquivo foi aberto (nenhum argumento passado)
+  
 
 --tira o map do f1
 vim.keymap.set({ "n","i"}, "<F3>", function()
@@ -80,8 +93,11 @@ vim.api.nvim_create_user_command("RestoreSession", function()
   require("persistence").load()
 end, {})
 
+vim.cmd.colorscheme("dracula") -- garanta que o tema está carregado antes
 
-
+vim.api.nvim_set_hl(0, "DashboardHeader", { fg = "#bd93f9", bold = true })   -- Roxo Dracula
+vim.api.nvim_set_hl(0, "DashboardCenter", { fg = "#50fa7b" })                -- Verde Dracula
+vim.api.nvim_set_hl(0, "DashboardFooter", { fg = "#ff79c6", italic = true }) -- Rosa Dracul
 
 local M = {}
 
@@ -107,3 +123,6 @@ M.create_new_project = function()
 end
 
 return M
+
+
+

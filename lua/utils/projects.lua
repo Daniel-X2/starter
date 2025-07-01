@@ -15,9 +15,10 @@ local function handle_creation(language, template)
     return
   end
 
-  local root = vim.fn.expand("~/Projects")
+  local root = vim.fn.expand("~/Área de trabalho/projetos")
   local path = root .. "/" .. name
 
+  -- se pasta não existir, cria
   if vim.fn.isdirectory(path) == 0 then
     vim.fn.mkdir(path, "p")
   else
@@ -29,28 +30,20 @@ local function handle_creation(language, template)
   if language == "Python" then
     if template == "Script simples" then
       main_file = "main.py"
-      vim.fn.writefile({ 'print("Hello, Python!")' }, path .. "/" .. main_file)
+      vim.fn.writefile({ 'print("Olá, Neovim!")' }, path .. "/" .. main_file)
 
     elseif template == "Projeto com venv" then
       main_file = "main.py"
-      vim.fn.system({ "python3", "-m", "venv", path .. "/venv" })
+      vim.fn.chdir(path)
+      vim.fn.system({ "python3", "-m", "venv", ".venv" })
       vim.fn.writefile({ 'print("Projeto com venv")' }, path .. "/" .. main_file)
     end
 
   elseif language == "C#" then
     if template == "Console App" then
+      -- Cria com dotnet
+      vim.fn.system({ "dotnet", "new", "console", "-o", path })
       main_file = "Program.cs"
-      vim.fn.writefile({
-        'using System;',
-        '',
-        'class Program',
-        '{',
-        '    static void Main(string[] args)',
-        '    {',
-        '        Console.WriteLine("Hello, C#!");',
-        '    }',
-        '}',
-      }, path .. "/" .. main_file)
 
     elseif template == "Estrutura básica" then
       main_file = "README.md"
@@ -84,8 +77,10 @@ local function handle_creation(language, template)
     end
   end
 
+  -- entra na pasta do projeto
   vim.cmd("cd " .. path)
 
+  -- abre o arquivo principal
   if main_file then
     vim.cmd("edit " .. path .. "/" .. main_file)
   else
@@ -102,7 +97,6 @@ M.create_new_project = function()
   }, function(language)
     if not language then return end
 
-    -- submenu de tipo de projeto
     vim.ui.select(project_templates[language], {
       prompt = "Escolha o tipo de projeto " .. language .. ":",
     }, function(template)
@@ -113,4 +107,3 @@ M.create_new_project = function()
 end
 
 return M
-
