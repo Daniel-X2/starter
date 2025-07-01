@@ -1,197 +1,248 @@
--- since this is just an example spec, don't actually load anything here and return an empty spec
--- stylua: ignore
-if true then return {} end
-
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
 return {
-  -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
-
-  -- Configure LazyVim to load gruvbox
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "gruvbox",
+  {--tudo ok 
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- opcional, para ícones
+      "MunifTanjim/nui.nvim",
     },
-  },
-
-  -- change trouble config
-  {
-    "folke/trouble.nvim",
-    -- opts will be merged with the parent spec
-    opts = { use_diagnostic_signs = true },
-  },
-
-  -- disable trouble
-  { "folke/trouble.nvim", enabled = false },
-
-  -- override nvim-cmp and add cmp-emoji
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = { "hrsh7th/cmp-emoji" },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" })
+    config = function()
+      require("neo-tree").setup()
     end,
   },
-
-  -- change some telescope options and a keymap to browse plugin files
+  
+  
+  {
+    "tpope/vim-fugitive",
+    cmd = { "Git", "G" },
+  },
   {
     "nvim-telescope/telescope.nvim",
-    keys = {
-      -- add a keymap to browse plugin files
-      -- stylua: ignore
-      {
-        "<leader>fp",
-        function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        desc = "Find Plugin File",
-      },
-    },
-    -- change some options
-    opts = {
-      defaults = {
-        layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
-        sorting_strategy = "ascending",
-        winblend = 0,
-      },
-    },
-  },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("telescope").setup({})
+      require('telescope').load_extension('projects')
 
-  -- add pyright to lspconfig
-  {
-    "neovim/nvim-lspconfig",
-    ---@class PluginLspOpts
-    opts = {
-      ---@type lspconfig.options
-      servers = {
-        -- pyright will be automatically installed with mason and loaded with lspconfig
-        pyright = {},
-      },
-    },
-  },
-
-  -- add tsserver and setup with typescript.nvim instead of lspconfig
-  {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      "jose-elias-alvarez/typescript.nvim",
-      init = function()
-        require("lazyvim.util").lsp.on_attach(function(_, buffer)
-          -- stylua: ignore
-          vim.keymap.set( "n", "<leader>co", "TypescriptOrganizeImports", { buffer = buffer, desc = "Organize Imports" })
-          vim.keymap.set("n", "<leader>cR", "TypescriptRenameFile", { desc = "Rename File", buffer = buffer })
-        end)
-      end,
-    },
-    ---@class PluginLspOpts
-    opts = {
-      ---@type lspconfig.options
-      servers = {
-        -- tsserver will be automatically installed with mason and loaded with lspconfig
-        tsserver = {},
-      },
-      -- you can do any additional lsp server setup here
-      -- return true if you don't want this server to be setup with lspconfig
-      ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
-      setup = {
-        -- example to setup with typescript.nvim
-        tsserver = function(_, opts)
-          require("typescript").setup({ server = opts })
-          return true
-        end,
-        -- Specify * to use this function as a fallback for any server
-        -- ["*"] = function(server, opts) end,
-      },
-    },
-  },
-
-  -- for typescript, LazyVim also includes extra specs to properly setup lspconfig,
-  -- treesitter, mason and typescript.nvim. So instead of the above, you can use:
-  { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  -- add more treesitter parsers
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        "bash",
-        "html",
-        "javascript",
-        "json",
-        "lua",
-        "markdown",
-        "markdown_inline",
-        "python",
-        "query",
-        "regex",
-        "tsx",
-        "typescript",
-        "vim",
-        "yaml",
-      },
-    },
-  },
-
-  -- since `vim.tbl_deep_extend`, can only merge tables and not lists, the code above
-  -- would overwrite `ensure_installed` with the new value.
-  -- If you'd rather extend the default config, use the code below instead:
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      -- add tsx and treesitter
-      vim.list_extend(opts.ensure_installed, {
-        "tsx",
-        "typescript",
-      })
     end,
   },
-
-  -- the opts function can also be used to change the default opts:
-  {
-    "nvim-lualine/lualine.nvim",
-    event = "VeryLazy",
-    opts = function(_, opts)
-      table.insert(opts.sections.lualine_x, {
-        function()
-          return "😄"
-        end,
-      })
+  
+  {--aqui esta ok
+    "soulis-1256/eagle.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("eagle").setup({})
     end,
   },
-
-  -- or you can return new options to override all the defaults
   {
-    "nvim-lualine/lualine.nvim",
-    event = "VeryLazy",
-    opts = function()
-      return {
-        --[[add your custom lualine config here]]
-      }
-    end,
+  "iabdelkareem/csharp.nvim",
+  dependencies = {
+    "williamboman/mason.nvim", -- Required, automatically installs omnisharp
+    "mfussenegger/nvim-dap",
+    "Tastyep/structlog.nvim", -- Optional, but highly recommended for debugging
   },
-
-  -- use mini.starter instead of alpha
-  { import = "lazyvim.plugins.extras.ui.mini-starter" },
-
-  -- add jsonls and schemastore packages, and setup treesitter for json, json5 and jsonc
-  { import = "lazyvim.plugins.extras.lang.json" },
-
-  -- add any tools you want to have installed below
+  config = function ()
+      require("mason").setup() -- Mason setup must run before csharp, only if you want to use omnisharp
+      require("csharp").setup()
+  end
+  },
   {
-    "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "stylua",
-        "shellcheck",
-        "shfmt",
-        "flake8",
+  "neolooong/whichpy.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = function()
+    require("whichpy").setup()
+  end,
+},
+
+  {--tudo certo aqui tambem 
+  "folke/twilight.nvim",
+  config = function()
+    require("twilight").setup({})
+  end,
+},
+  
+  {--tudo ok
+  "shellRaining/hlchunk.nvim",
+  config = function()
+    require("hlchunk").setup({})
+  end,
+},
+  {
+  "Zeioth/compiler.nvim",
+  dependencies = { "stevearc/overseer.nvim" },
+  config = function()
+    require("compiler").setup({})
+  end,
+},
+  {
+  "CRAG666/code_runner.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = function()
+    require("code_runner").setup({})
+  end,
+},
+{--tudo ok
+  "dracula/vim",
+  name = "dracula-official",
+  config = function()
+  vim.cmd("colorscheme dracula")
+  end,
+},
+{--tudo ok
+  "romgrk/barbar.nvim",
+  dependencies = { "nvim-web-devicons", "nvim-lua/plenary.nvim" },
+  init = function()
+    vim.g.barbar_auto_setup = false
+  end,
+  config = function()
+    require("barbar").setup({})
+  end,
+},
+
+{--tudo ok por aqui
+  "akinsho/toggleterm.nvim",
+  version = "*",
+  config = function()
+    require("toggleterm").setup {
+      size = 15,
+      open_mapping = [[<C-\>]],
+      shade_terminals = true,
+      shading_factor = 2,
+      direction = "horizontal", -- estilo VS Code
+      start_in_insert = true,
+      persist_size = true,
+      close_on_exit = true,
+      shell = vim.o.shell,
+    }
+    local Terminal  = require("toggleterm.terminal").Terminal
+  end,
+},
+{--tudo certo
+  "Pocco81/auto-save.nvim",
+  config = function()
+    require("auto-save").setup({})
+  end,
+},
+
+{
+  "stevearc/aerial.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  config = function()
+    require("aerial").setup({})
+  end,
+},
+{
+  "folke/persistence.nvim",
+  event = "BufReadPre", -- carrega antes de abrir buffer
+  config = function()
+    require("persistence").setup{
+      dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"), -- pasta das sessões
+      options = { "buffers", "curdir", "tabpages", "winsize" },
+    }
+  end,
+},
+{
+  "glepnir/dashboard-nvim",
+  dependencies = { "nvim-telescope/telescope.nvim", "nvim-tree/nvim-web-devicons" },
+  config = function()
+    local db = require('dashboard')
+
+    db.setup({
+      theme = 'doom',
+      config = {
+        header = {
+          'Welcome to Neovim',
+          '',
+        },
+        center = {
+          {
+            icon = ' ',
+            desc = 'New File',
+            action = 'enew',
+            key = 'n',
+          },
+{
+  icon = " ",
+  desc = "New Projects",
+  key = "N",
+  action = function()
+    require("utils.projects").create_new_project()
+  end,
+},
+
+
+          {
+  icon = ' ',
+  desc = 'Projects',
+  action = 'Telescope projects',
+  key = 'p',
+},
+
+          {
+            icon = ' ',
+            desc = 'Find Text',
+            action = 'Telescope live_grep',
+            key = 'g',
+          },
+          {
+            icon = ' ',
+            desc = 'Recent Files',
+            action = 'Telescope oldfiles',
+            key = 'r',
+          },
+          {
+            icon = ' ',
+            desc = 'Config',
+            action = 'Telescope find_files cwd=~/.config/nvim',
+            key = 'c',
+          },
+  {
+  icon = ' ',
+  desc = 'Restore Session',
+  key = 's',
+  action = 'RestoreSession',
+},
+
+
+
+
+          {
+            icon = ' ',
+            desc = 'Lazy Extras',
+            action = 'LazyExtras',
+            key = 'x',
+          },
+          {
+            icon = '󰒲 ',
+            desc = 'Lazy',
+            action = 'Lazy',
+            key = 'l',
+          },
+          {
+            icon = ' ',
+            desc = 'Quit',
+            action = 'qa',
+            key = 'q',
+          },
+        },
+        footer = {
+          '',
+          'Have a nice day!',
+        },
       },
-    },
-  },
+    })
+  end,
+},
+{
+  "ahmedkhalf/project.nvim",
+  config = function()
+    require("project_nvim").setup({
+      -- configurações opcionais, pode deixar vazio por enquanto
+    })
+  end,
+}
+
+
+
+
 }
